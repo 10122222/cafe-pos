@@ -1,0 +1,7 @@
+*.md
+**/dist
+**/package-lock.json
+**/vendor
+composer.lock
+public
+storage

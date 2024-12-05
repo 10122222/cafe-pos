@@ -18,7 +18,7 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            'amount' => fake()->numberBetween(20000, 200000),
+            'amount' => fake()->numberBetween(25000, 300000),
             'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];

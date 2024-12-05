@@ -101,7 +101,6 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->relationship('roles', 'name')
                     ->getOptionLabelFromRecordUsing(fn (Role $record): string => Str::headline($record->name))
                     ->preload()
-                    ->searchable()
                     ->label(__('resources/user.roles'))
                     ->inlineLabel(),
             ]);
@@ -122,8 +121,8 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label(__('resources/user.verified'))
                     ->badge()
-                    ->getStateUsing(fn ($record) => $record->email_verified_at ? 'Verified' : 'Not Verified')
-                    ->color(fn ($state) => $state === 'Verified' ? 'success' : 'danger')
+                    ->getStateUsing(fn (User $record) => $record->email_verified_at ? __('resources/user.verified') : __('resources/user.unverified'))
+                    ->color(fn (string $state) => $state === __('resources/user.verified') ? 'success' : 'danger')
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('roles')
@@ -211,5 +210,11 @@ class UserResource extends Resource implements HasShieldPermissions
     public static function getNavigationLabel(): string
     {
         return __('resources/user.plural');
+    }
+
+    /** @return Builder<User> */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('roles');
     }
 }

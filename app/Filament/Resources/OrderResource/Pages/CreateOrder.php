@@ -6,7 +6,6 @@ use App\Filament\Resources\OrderResource;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
-use Filament\Actions;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
@@ -22,6 +21,8 @@ class CreateOrder extends CreateRecord
 
     protected static string $resource = OrderResource::class;
 
+    protected ?string $currentStep = null;
+
     public function form(Form $form): Form
     {
         return parent::form($form)
@@ -31,7 +32,8 @@ class CreateOrder extends CreateRecord
                     ->cancelAction($this->getCancelFormAction())
                     ->submitAction($this->getSubmitFormAction())
                     ->skippable($this->hasSkippableSteps())
-                    ->contained(false),
+                    ->contained(false)
+                    ->persistStepInQueryString(),
             ])
             ->columns(null);
     }
@@ -75,28 +77,18 @@ class CreateOrder extends CreateRecord
     {
         return [
             Step::make(__('resources/order.details'))
+                ->icon('heroicon-o-identification')
                 ->schema([
                     Section::make()->schema(OrderResource::getDetailsFormSchema())->columns(),
                 ]),
 
             Step::make(__('resources/order.items'))
+                ->icon('heroicon-o-shopping-bag')
                 ->schema([
                     Section::make()->schema([
                         OrderResource::getItemsRepeater(),
                     ]),
                 ]),
-        ];
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\Action::make('reset')
-                ->hiddenLabel()
-                ->icon('heroicon-o-arrow-path')
-                ->color('gray')
-                ->tooltip(__('resources/order.actions.reset'))
-                ->action(fn () => $this->fillForm()),
         ];
     }
 

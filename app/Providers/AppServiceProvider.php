@@ -36,11 +36,11 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::unguard();
 
-        if (app()->environment('production')) {
+        if (app()->isProduction()) {
             URL::forceScheme('https');
         }
 
-        FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
+        FilamentShield::prohibitDestructiveCommands(app()->isProduction());
 
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
             $switch

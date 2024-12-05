@@ -23,10 +23,21 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $categories = [
+            'Hot Coffee',
+            'Iced Coffee',
+            'Tea',
+            'Pastries',
+            'Sandwiches',
+            'Desserts',
+            'Snacks',
+            'Non-Coffee Beverages',
+        ];
+
         return [
-            'name' => $name = fake()->unique()->words(3, true),
+            'name' => $name = fake()->unique()->randomElement($categories),
             'slug' => Str::slug($name),
-            'description' => fake()->realText(),
+            'description' => fake()->sentence(),
             'is_visible' => fake()->boolean(),
             'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => fake()->dateTimeBetween('-5 month'),

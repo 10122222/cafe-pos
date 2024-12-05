@@ -92,12 +92,12 @@ class ProductResource extends Resource implements HasShieldPermissions
                         Forms\Components\Section::make(__('resources/product.images'))
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('media')
-                                    ->image()
                                     ->moveFiles()
-                                    ->fetchFileInformation(false)
                                     ->collection('product-images')
                                     ->multiple()
                                     ->maxFiles(5)
+                                    ->reorderable()
+                                    ->acceptedFileTypes(['image/jpeg'])
                                     ->hiddenLabel(),
                             ])
                             ->collapsible(),
@@ -144,7 +144,8 @@ class ProductResource extends Resource implements HasShieldPermissions
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('product-image')
                     ->label(__('resources/product.image'))
-                    ->collection('product-images'),
+                    ->collection('product-images')
+                    ->conversion('thumb'),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('resources/product.name'))

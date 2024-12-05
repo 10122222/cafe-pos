@@ -16,6 +16,7 @@ readonly class DateRange
     public function __construct(
         public Carbon $start,
         public Carbon $end,
+        public string $label
     ) {}
 
     public function previous(): self
@@ -23,8 +24,9 @@ readonly class DateRange
         $diff = $this->start->diffInDays($this->end);
 
         return new self(
-            $this->start->copy()->subDays($diff)->startOfDay(),
-            $this->end->copy()->subDays($diff)->endOfDay()
+            $this->start->copy()->subDays($diff),
+            $this->end->copy()->subDays($diff),
+            $this->label
         );
     }
 }
@@ -37,9 +39,13 @@ class StatsOverviewWidget extends BaseWidget
 
     protected function getStats(): array
     {
+        [$from, $to, $label] = getCarbonInstancesFromDateString(
+            $this->filters['created_at'] ?? null
+        );
         $dateRange = new DateRange(
-            $this->getStartDate()->startOfDay(),
-            $this->getEndDate()->endOfDay()
+            $from,
+            $to,
+            $label
         );
 
         return [
@@ -74,7 +80,7 @@ class StatsOverviewWidget extends BaseWidget
             title: $title,
             value: $value,
             metrics: $metrics,
-            chart: $this->getChartData($table, $column, $range->start, $range->end)
+            chart: $this->getChartData($table, $column, $range->start, $range->end, $range->label)
         );
     }
 
@@ -125,16 +131,6 @@ class StatsOverviewWidget extends BaseWidget
             ->color($metrics['trend']['color']);
     }
 
-    private function getStartDate(): Carbon
-    {
-        return ! is_null($this->filters['startDate'] ?? null) ? Carbon::parse($this->filters['startDate']) : now()->subDays(7);
-    }
-
-    private function getEndDate(): Carbon
-    {
-        return ! is_null($this->filters['endDate'] ?? null) ? Carbon::parse($this->filters['endDate']) : now();
-    }
-
     /**
      * @return array<string, string>
      */
@@ -178,22 +174,29 @@ class StatsOverviewWidget extends BaseWidget
                 ->where('status', '!=', 'cancelled')
             : Customer::whereBetween('created_at', [$startDate, $endDate]);
 
-        return (int) $query::selectRaw('COUNT(*) as count')->value('count');
+        return (int) $query->selectRaw('COUNT(*) as count')->value('count');
     }
 
     /**
      * @return array<array-key, mixed>
      */
-    private function getChartData(string $model, ?string $column, Carbon $startDate, Carbon $endDate): array
+    private function getChartData(string $model, ?string $column, Carbon $startDate, Carbon $endDate, string $label): array
     {
-        if ($model === 'orders') {
-            $trend = Trend::query(OrderResource::getEloquentQuery()->where('status', '!=', 'cancelled'))
-                ->between(start: $startDate, end: $endDate)
-                ->perDay();
-        } else {
-            $trend = Trend::model(Customer::class)
-                ->between(start: $startDate, end: $endDate)
-                ->perDay();
+        $trend = $model === 'orders'
+            ? Trend::query(OrderResource::getEloquentQuery()->where('status', '!=', 'cancelled'))
+            : Trend::model(Customer::class);
+
+        $trend = $trend->between(start: $startDate, end: $endDate);
+
+        switch ($label) {
+            case 'perMonth':
+                $trend = $trend->perMonth();
+            case 'perWeek':
+                $trend = $trend->perWeek();
+            default:
+                $trend = $trend->perDay();
+
+                break;
         }
 
         return $column

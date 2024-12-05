@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\OrderResource\Widgets;
 
+use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
-use App\Models\Order;
 use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -22,20 +22,37 @@ class OrderStats extends BaseWidget
         return ListOrders::class;
     }
 
+    protected function getCurrentTabStatus(): ?string
+    {
+        return $this->getPropertyValue('activeTab');
+    }
+
     protected function getStats(): array
     {
-        $totalOrders = $this->getPageTableQuery()->count();
-        $orderData = Trend::model(Order::class)
+        $baseQuery = $this->getPageTableQuery();
+        $baseTrendQuery = OrderResource::getEloquentQuery();
+
+        if ($status = $this->getCurrentTabStatus()) {
+            $baseQuery->where('status', $status);
+            $baseTrendQuery->where('status', $status);
+        }
+
+        $totalOrders = $baseQuery->count();
+
+        $trendQuery = Trend::query($baseTrendQuery)
             ->between(
                 start: now()->subYear(),
                 end: now(),
             )
-            ->perMonth()
+            ->perMonth();
+
+        $orderData = $trendQuery->count();
+
+        $openOrders = $baseQuery->clone()
+            ->whereIn('status', ['new', 'processing'])
             ->count();
 
-        $openOrders = $this->getPageTableQuery()->whereIn('status', ['open', 'processing'])->count();
-
-        $averagePrice = round(floatval($this->getPageTableQuery()->avg('total_price')) / 100, precision: 2);
+        $averagePrice = round(floatval($baseQuery->avg('total_price')) / 100, precision: 2);
 
         return [
             Stat::make(__('resources/order.stat.orders'), $totalOrders)

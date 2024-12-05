@@ -14,6 +14,7 @@ return [
     'password_confirmation' => 'Confirm Password',
     'new_password_confirmation' => 'Confirm New Password',
     'verified' => 'Verified',
+    'unverified' => 'Unverified',
     'roles' => 'Roles',
     'created_at' => 'Join Date',
 

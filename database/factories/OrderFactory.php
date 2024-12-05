@@ -18,10 +18,10 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => 'OR-' . fake()->unique()->randomNumber(6),
-            'total_price' => fake()->numberBetween(20000, 200000),
+            'number' => 'POS-' . fake()->unique()->randomNumber(6),
+            'total_price' => fake()->numberBetween(25000, 300000),
             'status' => fake()->randomElement(['new', 'processing', 'completed', 'cancelled']),
-            'notes' => fake()->realText(100),
+            'notes' => fake()->optional()->randomElement(['No sugar', 'Extra hot', 'Less ice', 'Regular ice', 'No whipped cream']),
             'created_at' => fake()->dateTimeBetween('-1 year'),
             'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];

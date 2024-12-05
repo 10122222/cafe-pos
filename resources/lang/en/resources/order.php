@@ -41,6 +41,7 @@ return [
         'unit_price' => 'Price',
         'increase' => 'Increase',
         'decrease' => 'Decrease',
+        'reset_qty' => 'Reset quantity',
         'open_product' => 'Open product',
     ],
 

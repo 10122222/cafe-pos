@@ -18,8 +18,8 @@ class OrderItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'qty' => fake()->numberBetween(1, 10),
-            'unit_price' => fake()->numberBetween(10000, 100000),
+            'qty' => fake()->numberBetween(1, 5),
+            'unit_price' => fake()->numberBetween(25000, 75000),
         ];
     }
 }

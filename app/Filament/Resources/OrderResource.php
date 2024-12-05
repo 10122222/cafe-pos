@@ -12,11 +12,15 @@ use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\IconSize;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -69,7 +73,11 @@ class OrderResource extends Resource implements HasShieldPermissions
                                     ->color('danger')
                                     ->action(fn (Forms\Set $set) => $set(
                                         'items',
-                                        Product::query()::whereIsVisible(true)->whereHas('category', fn ($query) => $query::whereIsVisible(true))->get()
+                                        Product::query()
+                                            ->with('category')
+                                            ->whereIsVisible(true)
+                                            ->whereHas('category', fn ($query) => $query->whereIsVisible(true))
+                                            ->get()
                                             ->map(fn (Product $product) => [
                                                 'product_id' => $product->id,
                                                 'qty' => 0,
@@ -141,7 +149,7 @@ class OrderResource extends Resource implements HasShieldPermissions
                     ->sortable()
                     ->summarize([
                         Tables\Columns\Summarizers\Sum::make()
-                            ->money('IDR', 100),
+                            ->money('IDR'),
                     ])
                     ->money('IDR'),
                 Tables\Columns\TextColumn::make('created_at')
@@ -298,7 +306,6 @@ class OrderResource extends Resource implements HasShieldPermissions
             Forms\Components\Select::make('customer_id')
                 ->label(__('resources/order.customer'))
                 ->relationship('customer', 'name')
-                ->searchable()
                 ->preload()
                 ->required()
                 ->createOptionForm([
@@ -319,6 +326,7 @@ class OrderResource extends Resource implements HasShieldPermissions
                 ->label(__('resources/order.status'))
                 ->inline()
                 ->options(OrderStatus::class)
+                ->default(OrderStatus::New)
                 ->required(),
 
             Forms\Components\MarkdownEditor::make('notes')
@@ -327,9 +335,9 @@ class OrderResource extends Resource implements HasShieldPermissions
         ];
     }
 
-    public static function getItemsRepeater(): Repeater
+    public static function getItemsRepeater(): TableRepeater
     {
-        return Repeater::make('items')
+        return TableRepeater::make('items')
             ->relationship('items')
             ->schema([
                 Forms\Components\Hidden::make('product_id'),
@@ -342,20 +350,41 @@ class OrderResource extends Resource implements HasShieldPermissions
 
                         return $product?->name ?? '';
                     })
-                    ->columnSpan([
-                        'md' => 5,
-                    ])
-                    ->extraAttributes(['class' => 'h-9 flex items-center']),
+                    ->extraAttributes(['class' => 'h-9 flex items-center px-1']),
 
                 Forms\Components\TextInput::make('qty')
                     ->label(__('resources/order.item.quantity'))
-                    ->numeric()
+                    ->inputMode('numeric')
                     ->minValue(0)
                     ->maxValue(999)
                     ->default(0)
-                    ->columnSpan([
-                        'md' => 2,
-                    ])
+                    ->live(debounce: 1000)
+                    ->prefixAction(
+                        Action::make('decrement')
+                            ->iconButton()
+                            ->icon('heroicon-s-minus')
+                            ->iconSize(IconSize::Small)
+                            ->size(ActionSize::Small)
+                            ->action(fn (Forms\Get $get, Forms\Set $set) => $set('qty', $get('qty') - 1))
+                            ->disabled(fn (TextInput $component, Forms\Get $get) => $component->isDisabled() || $get('qty') <= 0),
+                        isInline: true
+                    )
+                    ->suffixAction(
+                        Action::make('increment')
+                            ->iconButton()
+                            ->icon('heroicon-s-plus')
+                            ->iconSize(IconSize::Small)
+                            ->size(ActionSize::Small)
+                            ->action(fn (Forms\Get $get, Forms\Set $set) => $set('qty', $get('qty') + 1))
+                            ->disabled(fn (TextInput $component, Forms\Get $get) => $component->isDisabled() || $get('qty') >= 999),
+                        isInline: true
+                    )
+                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, $old) {
+                        if ($get('qty') < 0 || $get('qty') > 999) {
+                            $set('qty', $old);
+                        }
+                    })
+                    ->extraInputAttributes(['class' => 'text-center'])
                     ->required(),
 
                 Forms\Components\TextInput::make('unit_price')
@@ -363,15 +392,26 @@ class OrderResource extends Resource implements HasShieldPermissions
                     ->disabled()
                     ->dehydrated()
                     ->numeric()
-                    ->required()
-                    ->columnSpan([
-                        'md' => 3,
-                    ]),
+                    ->required(),
             ])
             ->extraItemActions([
+                Action::make('resetQuantity')
+                    ->tooltip(__('resources/order.item.reset_qty'))
+                    ->icon('heroicon-m-arrow-path')
+                    ->color('warning')
+                    ->action(function (array $arguments, Repeater $component): void {
+                        $items = $component->getState();
+                        $items[$arguments['item']]['qty'] = 0;
+
+                        $component->state($items);
+
+                        $component->callAfterStateUpdated();
+                    })
+                    ->disabled(fn (?Order $record, string $operation): bool => $record?->status !== OrderStatus::New && $operation !== 'create'),
                 Action::make('openProduct')
                     ->tooltip(__('resources/order.item.open_product'))
                     ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->color('info')
                     ->url(function (array $arguments, Repeater $component): ?string {
                         $itemData = $component->getRawItemState($arguments['item']);
 
@@ -382,8 +422,7 @@ class OrderResource extends Resource implements HasShieldPermissions
                         }
 
                         return ProductResource::getUrl('view', ['record' => $product]);
-                    }, shouldOpenInNewTab: true)
-                    ->hidden(fn (array $arguments, Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['product_id'])),
+                    }, shouldOpenInNewTab: true),
             ])
             ->mutateRelationshipDataBeforeFillUsing(function (array $data): ?array {
                 return $data['qty'] > 0 ? $data : null;
@@ -395,28 +434,56 @@ class OrderResource extends Resource implements HasShieldPermissions
                 return $data['qty'] > 0 ? $data : null;
             })
             ->formatStateUsing(
-                fn (?array $state): array => Product::query()::whereIsVisible(true)->whereHas('category', fn ($query) => $query::whereIsVisible(true))->get()
-                    ->map(function (Product $product) use ($state) {
-                        $existingItem = collect($state)->first(function ($item) use ($product) {
-                            return $item['product_id'] === $product->id;
+                function (?array $state, ?Order $record): array {
+                    $query = Product::query()
+                        ->with('category')
+                        ->where(function ($query) use ($record) {
+                            $query->where(function ($q) {
+                                $q->whereIsVisible(true)
+                                    ->whereHas('category', fn ($q) => $q->whereIsVisible(true));
+                            });
+
+                            if ($record) {
+                                $query->orWhereIn('id', $record->items()->pluck('product_id'));
+                            }
                         });
 
-                        return [
-                            'product_id' => $product->id,
-                            'qty' => $existingItem['qty'] ?? 0,
-                            'unit_price' => $existingItem['unit_price'] ?? $product->price,
-                        ];
-                    })
-                    ->toArray()
+                    return $query->get()
+                        ->map(function (Product $product) use ($state) {
+                            $existingItem = collect($state)->first(function ($item) use ($product) {
+                                return $item['product_id'] === $product->id;
+                            });
+
+                            return [
+                                'product_id' => $product->id,
+                                'qty' => $existingItem['qty'] ?? 0,
+                                'unit_price' => $existingItem['unit_price'] ?? $product->price,
+                            ];
+                        })
+                        ->toArray();
+                }
             )
+            ->disabled(fn (?Order $record, string $operation): bool => $record?->status !== OrderStatus::New && $operation !== 'create')
             ->minItems(1)
             ->addable(false)
             ->deletable(false)
             ->reorderable(false)
             ->hiddenLabel()
-            ->columns([
-                'md' => 10,
-            ])
+            ->colStyles(function ($operation) {
+                if ($operation === 'create') {
+                    return [
+                        'product_name' => 'width: 70%',
+                        'qty' => 'width: 15%',
+                        'unit_price' => 'width: 15%',
+                    ];
+                }
+
+                return [
+                    'product_name' => 'width: 60%',
+                    'qty' => 'width: 20%',
+                    'unit_price' => 'width: 20%',
+                ];
+            })
             ->required();
     }
 

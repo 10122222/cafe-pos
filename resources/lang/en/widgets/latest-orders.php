@@ -30,8 +30,8 @@ return [
 
     'action' => [
 
-        'open' => [
-            'label' => 'Open',
+        'edit' => [
+            'label' => 'Edit',
         ],
 
     ],

@@ -15,7 +15,6 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class CategoryResource extends Resource implements HasShieldPermissions
@@ -111,12 +110,10 @@ class CategoryResource extends Resource implements HasShieldPermissions
                 Tables\Columns\IconColumn::make('is_visible')
                     ->label(__('resources/category.visibility'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('total_products')
+                Tables\Columns\TextColumn::make('products_count')
                     ->label(__('resources/category.total_products'))
-                    ->sortable(query: function (Builder $query, string $direction) {
-                        $query->withCount('products')->orderBy('products_count', $direction);
-                    })
-                    ->getStateUsing(fn (Category $record) => $record->products()->count()),
+                    ->counts('products')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('resources/category.updated_at'))
                     ->date(timezone: 'Asia/Jakarta')

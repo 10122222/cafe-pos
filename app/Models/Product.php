@@ -75,4 +75,18 @@ class Product extends Model implements HasMedia
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('product-images')
+            ->useDisk('product-images')
+            ->acceptsMimeTypes(['image/jpeg'])
+            ->registerMediaConversions(function (Media $media) {
+                $this
+                    ->addMediaConversion('thumb')
+                    ->width(40)
+                    ->height(40);
+            });
+    }
 }

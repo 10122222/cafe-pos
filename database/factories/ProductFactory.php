@@ -23,12 +23,28 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        $products = [
+            'Espresso',
+            'Cappuccino',
+            'Café Latte',
+            'Americano',
+            'Mocha',
+            'Green Tea Latte',
+            'Croissant',
+            'Chocolate Muffin',
+            'Cheesecake',
+            'Iced Caramel Macchiato',
+            'Club Sandwich',
+            'Chicken Wrap',
+            'Chocolate Brownie',
+        ];
+
         return [
-            'name' => $name = fake()->unique()->catchPhrase(),
+            'name' => $name = fake()->unique()->randomElement($products),
             'slug' => Str::slug($name),
-            'description' => fake()->realText(),
+            'description' => fake()->sentence(),
             'is_visible' => fake()->boolean(),
-            'price' => fake()->numberBetween(10000, 100000),
+            'price' => fake()->numberBetween(25000, 75000),
             'created_at' => fake()->dateTimeBetween('-1 year', '-6 month'),
             'updated_at' => fake()->dateTimeBetween('-5 month'),
         ];

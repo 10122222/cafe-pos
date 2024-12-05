@@ -45,6 +45,13 @@ return [
             'throw' => false,
         ],
 
+        'product-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/product-images'),
+            'url' => env('APP_URL') . '/storage/product-images',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

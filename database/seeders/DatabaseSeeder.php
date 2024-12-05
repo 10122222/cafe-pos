@@ -32,29 +32,33 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Super admin user created.');
 
         $this->command->warn(PHP_EOL . 'Creating categories...');
-        $categories = $this->withProgressBar(20, fn () => Category::factory(1)->create());
+        $categories = $this->withProgressBar(8, fn () => Category::factory(1)->create());
         $this->command->info('Categories created.');
 
         $this->command->warn(PHP_EOL . 'Creating products...');
-        $products = $this->withProgressBar(100, fn () => Product::factory(1)
+        $products = $this->withProgressBar(13, fn () => Product::factory(1)
             ->sequence(fn ($sequence) => ['category_id' => $categories->random(1)->first()->id])
             ->create());
         $this->command->info('Products created.');
 
         $this->command->warn(PHP_EOL . 'Creating customers...');
-        $customers = $this->withProgressBar(100, fn () => Customer::factory(1)->create());
+        $customers = $this->withProgressBar(50, fn () => Customer::factory(1)->create());
         $this->command->info('Customers created.');
 
         $this->command->warn(PHP_EOL . 'Creating orders...');
-        $orders = $this->withProgressBar(100, fn () => Order::factory(1)
+        $orders = $this->withProgressBar(50, fn () => Order::factory(1)
             ->sequence(fn ($sequence) => ['customer_id' => $customers->random(1)->first()->id])
             ->has(Payment::factory()->count(1))
             ->has(
                 OrderItem::factory()->count(rand(2, 5))
-                    ->state(fn (array $attributes, Order $order) => ['product_id' => $products->random(1)->first()->id]),
+                    ->state(fn (array $attributes, Order $order) => [
+                        'product_id' => $attributes['product_id'] = $products->random(1)->first()->id,
+                        'unit_price' => $products->find($attributes['product_id'])->price,
+                    ]),
                 'items'
             )
-            ->create()::each(function ($order) {
+            ->create()
+            ->each(function ($order) {
                 $totalPrice = $order->items->sum(function ($item) {
                     return $item->qty * $item->unit_price;
                 });
