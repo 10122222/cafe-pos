@@ -8,9 +8,6 @@ use BezhanSalleh\FilamentShield\FilamentShield;
 use Filament\Facades\Filament;
 use Filament\Http\Responses\Auth\Contracts\LogoutResponse as LogoutResponseContract;
 use Filament\Support\Facades\FilamentColor;
-use Filament\Support\Facades\FilamentView;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -33,10 +30,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // FilamentView::registerRenderHook(
-        //     PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
-        //     fn (): View => view('components.footer.simple-page-end'),
-        // );
         $this->app->bind(LogoutResponseContract::class, LogoutResponse::class);
     }
 

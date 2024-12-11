@@ -21,11 +21,6 @@ class Welcome extends SimplePage
         }
     }
 
-    // public function hasTopbar(): bool
-    // {
-    //     return false;
-    // }
-
     public function getMaxWidth(): MaxWidth | string | null
     {
         return MaxWidth::ScreenLarge;
