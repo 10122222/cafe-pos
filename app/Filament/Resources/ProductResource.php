@@ -99,6 +99,7 @@ class ProductResource extends Resource implements HasShieldPermissions
                     ->label(__('resources/product.image'))
                     ->collection('product-images')
                     ->conversion('webp')
+                    ->checkFileExistence(false)
                     ->extraImgAttributes(fn (Product $record) => [
                         'alt' => 'Product image of ' . $record->name,
                         'loading' => 'lazy',
@@ -183,6 +184,7 @@ class ProductResource extends Resource implements HasShieldPermissions
                                     ->conversion('webp')
                                     ->hiddenLabel()
                                     ->placeholder(__('resources/product.no_images'))
+                                    ->checkFileExistence(false)
                                     ->extraImgAttributes(fn (Product $record) => [
                                         'alt' => 'Product image of ' . $record->name,
                                         'loading' => 'lazy',

@@ -42,6 +42,7 @@ class Home extends Component implements HasForms, HasTable
                         ->collection('product-images')
                         ->conversion('webp')
                         ->grow(false)
+                        ->checkFileExistence(false)
                         ->extraImgAttributes(fn (Product $record) => [
                             'alt' => 'Product image of ' . $record->name,
                             'loading' => 'lazy',
