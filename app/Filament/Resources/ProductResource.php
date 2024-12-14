@@ -350,7 +350,6 @@ class ProductResource extends Resource implements HasShieldPermissions
     protected static function getImagesFormComponent(): Component
     {
         return SpatieMediaLibraryFileUpload::make('media')
-            ->moveFiles()
             ->collection('product-images')
             ->conversion('webp')
             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
