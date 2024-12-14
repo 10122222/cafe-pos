@@ -42,7 +42,10 @@ class Home extends Component implements HasForms, HasTable
                         ->collection('product-images')
                         ->conversion('webp')
                         ->grow(false)
-                        ->limit(1),
+                        ->extraImgAttributes(fn (Product $record) => [
+                            'alt' => 'Product image of ' . $record->name,
+                            'loading' => 'lazy',
+                        ]),
 
                     Stack::make([
                         TextColumn::make('name')

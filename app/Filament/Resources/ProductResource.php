@@ -99,8 +99,10 @@ class ProductResource extends Resource implements HasShieldPermissions
                     ->label(__('resources/product.image'))
                     ->collection('product-images')
                     ->conversion('webp')
-                    ->limit(1)
-                    ->limitedRemainingText(),
+                    ->extraImgAttributes(fn (Product $record) => [
+                        'alt' => 'Product image of ' . $record->name,
+                        'loading' => 'lazy',
+                    ]),
 
                 TextColumn::make('name')
                     ->label(__('resources/product.name'))
@@ -180,7 +182,11 @@ class ProductResource extends Resource implements HasShieldPermissions
                                     ->collection('product-images')
                                     ->conversion('webp')
                                     ->hiddenLabel()
-                                    ->placeholder(__('resources/product.no_images')),
+                                    ->placeholder(__('resources/product.no_images'))
+                                    ->extraImgAttributes(fn (Product $record) => [
+                                        'alt' => 'Product image of ' . $record->name,
+                                        'loading' => 'lazy',
+                                    ]),
                             ]),
                         InfolistsSection::make(__('resources/product.pricing'))
                             ->schema([
@@ -347,10 +353,6 @@ class ProductResource extends Resource implements HasShieldPermissions
             ->moveFiles()
             ->collection('product-images')
             ->conversion('webp')
-            ->multiple()
-            ->maxFiles(5)
-            ->reorderable()
-            ->appendFiles()
             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->hiddenLabel();
     }
