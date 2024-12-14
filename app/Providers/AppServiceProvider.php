@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Http\Responses\LogoutResponse;
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use BezhanSalleh\FilamentShield\FilamentShield;
 use Filament\Facades\Filament;
 use Filament\Http\Responses\Auth\Contracts\LogoutResponse as LogoutResponseContract;
@@ -51,11 +50,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         FilamentShield::prohibitDestructiveCommands(app()->isProduction());
-
-        // LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
-        //     $switch
-        //         ->locales(['en', 'id']);
-        // });
 
         Health::checks([
             CacheCheck::new(),
