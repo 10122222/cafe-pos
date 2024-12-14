@@ -79,7 +79,7 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Amber,
             ])
             ->databaseNotifications()
-            ->favicon(secure_asset('favicon/favicon.ico'))
+            ->favicon(asset('favicon/favicon.ico', app()->isProduction()))
             ->font('Poppins')
             ->plugins([
                 FilamentBackgroundsPlugin::make()
