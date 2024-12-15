@@ -30,7 +30,7 @@ class ListProducts extends Component implements HasForms, HasTable
     {
         return $table
             ->query(
-                Product::query()->with('items')
+                Product::query()
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name'),

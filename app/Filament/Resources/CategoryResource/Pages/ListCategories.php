@@ -7,19 +7,10 @@ use App\Filament\Imports\CategoryImporter;
 use App\Filament\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Livewire\Attributes\On;
 
 class ListCategories extends ListRecords
 {
     protected static string $resource = CategoryResource::class;
-
-    public string $visibility = 'on';
-
-    #[On('visibilityUpdated')]
-    public function visibilityUpdated(string $value): void
-    {
-        $this->visibility = $value;
-    }
 
     protected function getHeaderActions(): array
     {

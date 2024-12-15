@@ -26,16 +26,14 @@
 
         @filamentStyles
         @vite('resources/css/app.css')
-
-        @filamentScripts
-        @vite('resources/js/app.js')
-
-        @stack('scripts')
     </head>
 
     <body class="antialiased">
         {{ $slot }}
 
         @livewire('notifications')
+
+        @filamentScripts
+        @vite('resources/js/app.js')
     </body>
 </html>

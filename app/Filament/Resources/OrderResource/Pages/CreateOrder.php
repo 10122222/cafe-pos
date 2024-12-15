@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\OrderResource\Pages;
 
 use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\OrderResource\Components\OrderForm;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
@@ -51,7 +52,7 @@ class CreateOrder extends CreateRecord
         $order->update(['total_price' => $total_price]);
 
         /** @var User $user */
-        $user = auth()->user();
+        $user = auth()->guard()->user();
 
         /** @var Customer $customer */
         $customer = $order->customer;
@@ -79,14 +80,14 @@ class CreateOrder extends CreateRecord
             Step::make(__('resources/order.details'))
                 ->icon('heroicon-o-identification')
                 ->schema([
-                    Section::make()->schema(OrderResource::getDetailsFormSchema())->columns(),
+                    Section::make()->schema(OrderForm::getDetailsFormSchema())->columns(),
                 ]),
 
             Step::make(__('resources/order.items'))
                 ->icon('heroicon-o-shopping-bag')
                 ->schema([
                     Section::make()->schema([
-                        OrderResource::getItemsRepeater(),
+                        OrderForm::getItemsRepeater(),
                     ]),
                 ]),
         ];

@@ -34,7 +34,6 @@ class ListOrders extends Component implements HasForms, HasTable
         return $table
             ->query(
                 Order::query()
-                    ->with('items')
                     ->where('status', '=', OrderStatus::Completed)
             )
             ->columns([

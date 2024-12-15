@@ -185,12 +185,12 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "BezhanSalleh\\FilamentShield\\FilamentShieldServiceProvider"
-                    ],
                     "aliases": {
                         "FilamentShield": "BezhanSalleh\\FilamentShield\\Facades\\FilamentShield"
-                    }
+                    },
+                    "providers": [
+                        "BezhanSalleh\\FilamentShield\\FilamentShieldServiceProvider"
+                    ]
                 }
             },
             "autoload": {
