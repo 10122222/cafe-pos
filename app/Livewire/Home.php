@@ -73,10 +73,9 @@ class Home extends Component implements HasForms, HasTable
             ->defaultGroup('category.name')
             ->groupingSettingsHidden()
             ->contentGrid([
-                'md' => 1,
+                'sm' => 1,
                 'xl' => 2,
             ])
-            ->contentFooter(view('components.footer.simple-page-end'))
             ->paginated(false);
     }
 

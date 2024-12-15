@@ -13,9 +13,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
-use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -89,10 +87,6 @@ class AdminPanelProvider extends PanelProvider
                     ->usingPage(HealthCheckResults::class),
             ])
             ->profile(page: EditProfile::class, isSimple: false)
-            ->renderHook(
-                PanelsRenderHook::BODY_END,
-                fn (): View => view('components.footer.index'),
-            )
             ->sidebarCollapsibleOnDesktop()
             ->spa()
             ->unsavedChangesAlerts();

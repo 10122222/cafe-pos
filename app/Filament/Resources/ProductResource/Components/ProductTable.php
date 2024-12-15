@@ -29,8 +29,8 @@ class ProductTable
             static::getImagesColumn(),
             static::getNameColumn(),
             static::getCategoryColumn(),
-            static::getVisibilityColumn(),
             static::getPriceColumn(),
+            static::getVisibilityColumn(),
         ];
     }
 

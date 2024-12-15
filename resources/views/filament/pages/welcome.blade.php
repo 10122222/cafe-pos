@@ -6,18 +6,14 @@
     $styleVersion = asset("css/swisnl/filament-backgrounds/filament-backgrounds-styles.css?v=$version");
 @endphp
 
-@push('styles')
-    <link
-        href="{{ $styleVersion }}"
-        rel="stylesheet"
-        data-navigate-track
-    />
+@pushOnce('styles')
+    <link href="{{ $styleVersion }}" rel="stylesheet" data-navigate-track />
     <style>
         :root {
             --filament-backgrounds-image: url('{{ $backgroundImage }}');
         }
     </style>
-@endpush
+@endPushOnce
 
 <x-filament-panels::page.simple>
     @livewire('home')
