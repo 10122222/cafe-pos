@@ -25,32 +25,22 @@ class LatestOrders extends BaseWidget
             )
             ->defaultPaginationPageOption(5)
             ->defaultSort('created_at', 'desc')
-            ->heading(__('widgets/latest-orders.heading'))
+            ->heading('Latest orders')
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('widgets/latest-orders.column.created_at.label'))
-                    ->date()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('number')
-                    ->label(__('widgets/latest-orders.column.number.label'))
-                    ->searchable()
-                    ->sortable(),
+                    ->label('Number'),
                 Tables\Columns\TextColumn::make('customer.name')
-                    ->label(__('widgets/latest-orders.column.customer.label'))
-                    ->searchable()
-                    ->sortable(),
+                    ->label('Customer'),
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('widgets/latest-orders.column.status.label'))
+                    ->label('Status')
                     ->badge(),
                 Tables\Columns\TextColumn::make('total_price')
-                    ->label(__('widgets/latest-orders.column.total_price.label'))
-                    ->searchable()
-                    ->sortable()
+                    ->label('Total')
                     ->money('IDR'),
             ])
             ->actions([
-                Tables\Actions\Action::make('open')
-                    ->label(__('widgets/latest-orders.action.edit.label'))
+                Tables\Actions\Action::make('edit')
+                    ->label('Edit')
                     ->url(fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record])),
             ]);
     }

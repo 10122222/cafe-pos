@@ -5,6 +5,7 @@ namespace App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource;
 use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\EditRole as BaseEditRole;
 use Filament\Actions;
+use Filament\Notifications;
 
 class EditRole extends BaseEditRole
 {
@@ -19,12 +20,27 @@ class EditRole extends BaseEditRole
                 ->color('gray')
                 ->tooltip('Reset')
                 ->action(fn () => $this->fillForm()),
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make()
+                ->successNotification(
+                    Notifications\Notification::make()
+                        ->success()
+                        ->title('Role deleted')
+                        ->body('The role has been deleted successfully.')
+                ),
         ];
     }
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('index');
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
+
+    protected function getSavedNotification(): ?Notifications\Notification
+    {
+        return Notifications\Notification::make()
+            ->success()
+            ->title('Role updated')
+            ->body('The role has been updated successfully.');
     }
 }

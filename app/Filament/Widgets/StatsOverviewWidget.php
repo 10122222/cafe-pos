@@ -50,20 +50,20 @@ class StatsOverviewWidget extends BaseWidget
 
         return [
             $this->createStats(
-                __('widgets/stats-overview.stats.revenue.title'),
+                'Revenue',
                 'orders',
                 'total_price',
                 $dateRange,
                 fn ($value) => 'Rp ' . $this->formatNumber($value)
             ),
             $this->createStats(
-                __('widgets/stats-overview.stats.new_customers.title'),
+                'New customers',
                 'customers',
                 null,
                 $dateRange
             ),
             $this->createStats(
-                __('widgets/stats-overview.stats.new_orders.title'),
+                'New orders',
                 'orders',
                 null,
                 $dateRange
@@ -105,8 +105,6 @@ class StatsOverviewWidget extends BaseWidget
 
     private function formatNumber(int $number): string
     {
-        $number = round(floatval($number) / 100, 2);
-
         return match (true) {
             $number < 1000 => (string) Number::format($number, 0, locale: config('app.locale')),
             $number < 1000000 => Number::format($number / 1000, 2, locale: config('app.locale')) . 'k',
@@ -140,7 +138,7 @@ class StatsOverviewWidget extends BaseWidget
         $direction = $isPositive ? 'increase' : 'decrease';
 
         return [
-            'direction' => __('widgets/stats-overview.trend.' . $direction),
+            'direction' => $direction,
             'icon' => $isPositive ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down',
             'color' => $isPositive ? 'success' : 'danger',
         ];
@@ -152,7 +150,7 @@ class StatsOverviewWidget extends BaseWidget
             return $diffValue > 0 ? 100 : 0;
         }
 
-        return round(($diffValue / $oldValue) * 100, 2);
+        return $diffValue / $oldValue;
     }
 
     private function getSum(string $table, string $column, Carbon $startDate, Carbon $endDate): mixed

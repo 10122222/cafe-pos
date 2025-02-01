@@ -36,13 +36,6 @@ class Payment extends Model
     /** @use HasFactory<PaymentFactory> */
     use HasFactory;
 
-    /**
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'amount' => MoneyCast::class,
-    ];
-
     /** @return BelongsTo<Order,$this> */
     public function order(): BelongsTo
     {

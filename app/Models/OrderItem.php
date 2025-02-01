@@ -41,13 +41,6 @@ class OrderItem extends Pivot
     /** @use HasFactory<OrderItemFactory> */
     use HasFactory;
 
-    /**
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'unit_price' => MoneyCast::class,
-    ];
-
     /** @return BelongsTo<Order,$this> */
     public function order(): BelongsTo
     {

@@ -44,16 +44,6 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label(__('navigation.group.catalog')),
-                NavigationGroup::make()
-                    ->label(__('navigation.group.transactions')),
-                NavigationGroup::make()
-                    ->label(__('navigation.group.access_control')),
-                NavigationGroup::make()
-                    ->label(__('navigation.group.settings')),
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -80,15 +70,14 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon/favicon.ico', app()->isProduction()))
             ->font('Poppins')
             ->plugins([
-                FilamentBackgroundsPlugin::make()
-                    ->remember(900),
                 FilamentShieldPlugin::make(),
                 FilamentSpatieLaravelHealthPlugin::make()
                     ->usingPage(HealthCheckResults::class),
             ])
             ->profile(page: EditProfile::class, isSimple: false)
-            ->sidebarCollapsibleOnDesktop()
             ->spa()
+            ->topbar()
+            ->topNavigation()
             ->unsavedChangesAlerts();
     }
 }

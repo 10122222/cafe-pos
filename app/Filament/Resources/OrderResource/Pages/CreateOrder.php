@@ -77,13 +77,13 @@ class CreateOrder extends CreateRecord
     protected function getSteps(): array
     {
         return [
-            Step::make(__('resources/order.details'))
+            Step::make('Details')
                 ->icon('heroicon-o-identification')
                 ->schema([
                     Section::make()->schema(OrderForm::getDetailsFormSchema())->columns(),
                 ]),
 
-            Step::make(__('resources/order.items'))
+            Step::make('Items')
                 ->icon('heroicon-o-shopping-bag')
                 ->schema([
                     Section::make()->schema([

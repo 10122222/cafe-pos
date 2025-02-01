@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Order::class);
-            $table->unsignedInteger('amount');
+            $table->decimal('amount', 10);
             $table->timestamps();
         });
     }

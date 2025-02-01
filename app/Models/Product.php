@@ -61,7 +61,6 @@ class Product extends Model implements HasMedia
      */
     protected $casts = [
         'is_visible' => 'boolean',
-        'price' => MoneyCast::class,
     ];
 
     /** @return BelongsTo<Category,$this> */

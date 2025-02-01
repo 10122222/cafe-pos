@@ -5,10 +5,13 @@ namespace App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Resources\RoleResource;
 use BezhanSalleh\FilamentShield\Resources\RoleResource\Pages\CreateRole as BaseCreateRole;
 use Filament\Actions;
+use Filament\Notifications;
 
 class CreateRole extends BaseCreateRole
 {
     protected static string $resource = RoleResource::class;
+
+    protected static bool $canCreateAnother = false;
 
     protected function getHeaderActions(): array
     {
@@ -24,6 +27,14 @@ class CreateRole extends BaseCreateRole
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('index');
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
+
+    protected function getCreatedNotification(): ?Notifications\Notification
+    {
+        return Notifications\Notification::make()
+            ->success()
+            ->title('Role created')
+            ->body('The role has been created successfully.');
     }
 }

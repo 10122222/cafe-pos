@@ -71,7 +71,6 @@ class Order extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'total_price' => MoneyCast::class,
         'status' => OrderStatus::class,
     ];
 

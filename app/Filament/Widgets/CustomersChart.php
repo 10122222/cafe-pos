@@ -29,22 +29,30 @@ class CustomersChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('widgets/customers-chart.datasets.label'),
+                    'label' => 'Customers',
                     'data' => $data,
                     'fill' => 'start',
                 ],
             ],
-            'labels' => __('widgets/customers-chart.labels'),
+            'labels' => [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ],
         ];
     }
 
     protected function getType(): string
     {
         return 'line';
-    }
-
-    public function getHeading(): string | Htmlable | null
-    {
-        return __('widgets/customers-chart.heading');
     }
 }

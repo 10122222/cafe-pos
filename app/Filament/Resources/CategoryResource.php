@@ -6,27 +6,10 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
+use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
-use Filament\Infolists\Components\Grid as InfolistsGrid;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section as InfolistsSection;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
-use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
 class CategoryResource extends Resource implements HasShieldPermissions
@@ -56,131 +39,54 @@ class CategoryResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
-                Section::make()
+                Forms\Components\Group::make()
                     ->schema([
-                        Grid::make()
+                        Forms\Components\Section::make()
                             ->schema([
-                                TextInput::make('name')
-                                    ->label(__('resources/category.name'))
-                                    ->required()
-                                    ->maxLength(255)
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Name')
                                     ->autofocus(fn (string $operation) => $operation === 'create')
                                     ->lazy()
-                                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                                    ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
                                         if ($state === null) {
                                             return;
                                         }
 
                                         $set('slug', Str::slug($state));
-                                    }),
+                                    })
+                                    ->required()
+                                    ->maxLength(255),
 
-                                TextInput::make('slug')
-                                    ->label(__('resources/category.slug'))
+                                Forms\Components\TextInput::make('slug')
+                                    ->label('Slug')
                                     ->disabled()
                                     ->dehydrated()
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(Category::class, 'slug', ignoreRecord: true),
-                            ]),
 
-                        Toggle::make('is_visible')
-                            ->label(__('resources/category.is_visible'))
-                            ->default(true),
-
-                        MarkdownEditor::make('description')
-                            ->label(__('resources/category.description')),
-                    ])
-                    ->columnSpan(['lg' => fn (?Category $record) => $record === null ? 3 : 2]),
-                Section::make()
-                    ->schema([
-                        Placeholder::make('created_at')
-                            ->label(__('resources/category.created_at'))
-                            ->content(fn (Category $record): ?string => $record->created_at?->setTimezone('Asia/Jakarta')->diffForHumans()),
-
-                        Placeholder::make('updated_at')
-                            ->label(__('resources/category.updated_at'))
-                            ->content(fn (Category $record): ?string => $record->updated_at?->setTimezone('Asia/Jakarta')->diffForHumans()),
-                    ])
-                    ->columnSpan(['lg' => 1])
-                    ->hidden(fn (?Category $record) => $record === null),
-            ])
-            ->columns(3);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                TextColumn::make('name')
-                    ->label(__('resources/category.name'))
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('products_count')
-                    ->label(__('resources/category.total_products'))
-                    ->counts('products')
-                    ->alignCenter()
-                    ->sortable(),
-                ToggleColumn::make('is_visible')
-                    ->label(__('resources/category.visibility'))
-                    ->onColor('success')
-                    ->offColor('danger')
-                    ->sortable(),
-                TextColumn::make('updated_at')
-                    ->label(__('resources/category.updated_at'))
-                    ->date(timezone: 'Asia/Jakarta')
-                    ->dateTimeTooltip(timezone: 'Asia/Jakarta')
-                    ->sortable(),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                InfolistsSection::make()
-                    ->schema([
-                        InfolistsGrid::make()
-                            ->schema([
-                                TextEntry::make('name')
-                                    ->label(__('resources/category.name')),
-                            ]),
-
-                        IconEntry::make('is_visible')
-                            ->label(__('resources/category.visibility'))
-                            ->icon(fn (string $state): string => match ($state) {
-                                '1' => 'heroicon-o-check-circle',
-                                default => 'heroicon-o-x-circle',
-                            }),
-
-                        TextEntry::make('description')
-                            ->markdown()
-                            ->label(__('resources/category.description'))
-                            ->placeholder(__('resources/category.no_description')),
+                                Forms\Components\MarkdownEditor::make('description')
+                                    ->label('Description')
+                                    ->disableToolbarButtons(['attachFiles', 'codeBlock', 'table'])
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2),
                     ])
                     ->columnSpan(['lg' => 2]),
-                InfolistsSection::make()
-                    ->schema([
-                        TextEntry::make('created_at')
-                            ->label(__('resources/category.created_at'))
-                            ->since()
-                            ->dateTimeTooltip(timezone: 'Asia/Jakarta'),
 
-                        TextEntry::make('updated_at')
-                            ->label(__('resources/category.updated_at'))
-                            ->since()
-                            ->dateTimeTooltip(timezone: 'Asia/Jakarta'),
+                Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Status')
+                            ->schema([
+                                Forms\Components\Toggle::make('is_visible')
+                                    ->onColor('success')
+                                    ->offColor('danger')
+                                    ->onIcon('heroicon-s-check')
+                                    ->offIcon('heroicon-s-x-mark')
+                                    ->label('Visible')
+                                    ->helperText('Whether the category is visible to customers')
+                                    ->default(true),
+                            ]),
                     ])
                     ->columnSpan(['lg' => 1]),
             ])
@@ -190,7 +96,7 @@ class CategoryResource extends Resource implements HasShieldPermissions
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ProductsRelationManager::class,
+            //
         ];
     }
 
@@ -201,26 +107,16 @@ class CategoryResource extends Resource implements HasShieldPermissions
             'create' => Pages\CreateCategory::route('/create'),
             'view' => Pages\ViewCategory::route('/{record}'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'products' => Pages\ManageCategoryProducts::route('/{record}/products'),
         ];
     }
 
-    public static function getModelLabel(): string
+    public static function getRecordSubNavigation(Page $page): array
     {
-        return __('resources/category.single');
-    }
-
-    public static function getModelLabelPlural(): string
-    {
-        return __('resources/category.plural');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('resources/category.nav.group');
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('resources/category.plural');
+        return $page->generateNavigationItems([
+            Pages\ViewCategory::class,
+            Pages\EditCategory::class,
+            Pages\ManageCategoryProducts::class,
+        ]);
     }
 }

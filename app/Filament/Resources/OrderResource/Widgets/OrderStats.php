@@ -55,14 +55,14 @@ class OrderStats extends BaseWidget
         $averagePrice = round(floatval($baseQuery->avg('total_price')) / 100, precision: 2);
 
         return [
-            Stat::make(__('resources/order.stat.orders'), $totalOrders)
+            Stat::make('Total orders', $totalOrders)
                 ->chart(
                     $orderData
                         ->map(fn (TrendValue $value) => $value->aggregate)
                         ->toArray()
                 ),
-            Stat::make(__('resources/order.stat.open_orders'), $openOrders),
-            Stat::make(__('resources/order.stat.avg_price'), Number::currency($averagePrice, 'IDR', config('app.locale'))),
+            Stat::make('Open orders', $openOrders),
+            Stat::make('Average price', Number::currency($averagePrice, 'IDR', config('app.locale'))),
         ];
     }
 }

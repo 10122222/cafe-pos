@@ -4,14 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Components\OrderForm;
-use App\Filament\Resources\OrderResource\Components\OrderTable;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -52,37 +51,6 @@ class OrderResource extends Resource implements HasShieldPermissions
                 $record?->status === OrderStatus::Cancelled
             )
             ->columns(3);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns(OrderTable::getColumns())
-            ->filters(OrderTable::getFilters())
-            ->actions(OrderTable::getActions())
-            ->bulkActions(OrderTable::getBulkActions())
-            ->groups(OrderTable::getGroups())
-            ->defaultSort('created_at', 'desc');
-    }
-
-    public static function getModelLabel(): string
-    {
-        return __('resources/order.single');
-    }
-
-    public static function getModelLabelPlural(): string
-    {
-        return __('resources/order.plural');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('resources/order.nav.group');
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('resources/order.plural');
     }
 
     public static function getNavigationBadge(): ?string

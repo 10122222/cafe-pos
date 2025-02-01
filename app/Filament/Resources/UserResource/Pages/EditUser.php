@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Actions;
+use Filament\Notifications;
 use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
@@ -19,12 +20,27 @@ class EditUser extends EditRecord
                 ->color('gray')
                 ->tooltip('Reset')
                 ->action(fn () => $this->fillForm()),
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make()
+                ->successNotification(
+                    Notifications\Notification::make()
+                        ->success()
+                        ->title('User deleted')
+                        ->body('The user has been deleted successfully.')
+                ),
         ];
     }
 
     protected function getRedirectUrl(): string
     {
-        return static::getResource()::getUrl('index');
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
+
+    protected function getSavedNotification(): ?Notifications\Notification
+    {
+        return Notifications\Notification::make()
+            ->success()
+            ->title('User updated')
+            ->body('The user has been updated successfully.');
     }
 }

@@ -34,10 +34,10 @@ class OrderForm
         return [
             Group::make()
                 ->schema([
-                    Section::make(__('resources/order.details'))
+                    Section::make('Details')
                         ->schema(static::getDetailsFormSchema()),
 
-                    Section::make(__('resources/order.items'))
+                    Section::make('Items')
                         ->headerActions([
                             static::getResetItemsAction(),
                         ])
@@ -63,7 +63,7 @@ class OrderForm
                     Section::make()
                         ->schema([
                             Placeholder::make('total_price')
-                                ->label(__('resources/order.total'))
+                                ->label('Total')
                                 ->content(fn (Order $record): ?string => $record->total_price ? 'Rp ' . number_format($record->total_price, 2, ',', '.') : null),
 
                             static::getPaymentFormSchema(),
@@ -143,9 +143,9 @@ class OrderForm
             ->simple(static::getPaymentAmountField())
             ->deletable(false)
             ->maxItems(1)
-            ->addActionLabel(__('resources/order.actions.add_payment'))
+            ->addActionLabel('Add Payment')
             ->hidden(fn (?Order $record): bool => $record?->status === OrderStatus::New)
-            ->label(__('resources/order.cash'))
+            ->label('Cash')
             ->hiddenLabel(fn (?array $state) => empty($state));
     }
 
@@ -188,13 +188,13 @@ class OrderForm
     protected static function getCustomerField(): Select
     {
         return Select::make('customer_id')
-            ->label(__('resources/order.customer'))
+            ->label('Customer')
             ->relationship('customer', 'name')
             ->preload()
             ->required()
             ->createOptionForm([
                 TextInput::make('name')
-                    ->label(__('resources/order.customer.name'))
+                    ->label('Name')
                     ->required()
                     ->maxLength(255),
             ])
@@ -230,7 +230,7 @@ class OrderForm
     protected static function getProductNameField(): Placeholder
     {
         return Placeholder::make('product_name')
-            ->label(__('resources/order.item.product'))
+            ->label('Product')
             ->content(fn (Get $get) => $get('product_name'))
             ->extraAttributes(['class' => 'h-9 flex items-center px-1']);
     }
@@ -238,7 +238,7 @@ class OrderForm
     protected static function getQuantityField(): TextInput
     {
         return TextInput::make('qty')
-            ->label(__('resources/order.item.quantity'))
+            ->label('Qty')
             ->inputMode('numeric')
             ->minValue(0)
             ->maxValue(999)
@@ -276,7 +276,7 @@ class OrderForm
     protected static function getUnitPriceField(): TextInput
     {
         return TextInput::make('unit_price')
-            ->label(__('resources/order.item.unit_price'))
+            ->label('Unit Price')
             ->disabled()
             ->dehydrated()
             ->numeric()
@@ -311,7 +311,7 @@ class OrderForm
     {
         return [
             Action::make('resetQuantity')
-                ->tooltip(__('resources/order.item.reset_qty'))
+                ->tooltip('Reset quantity')
                 ->icon('heroicon-m-arrow-path')
                 ->color('warning')
                 ->action(function (array $arguments, Repeater $component): void {
@@ -326,7 +326,7 @@ class OrderForm
                 ->disabled(fn (?Order $record, string $operation): bool => $record?->status !== OrderStatus::New && $operation !== 'create'),
 
             Action::make('openProduct')
-                ->tooltip(__('resources/order.item.open_product'))
+                ->tooltip('Open product')
                 ->icon('heroicon-m-arrow-top-right-on-square')
                 ->color('info')
                 ->url(function (array $arguments, Repeater $component): ?string {

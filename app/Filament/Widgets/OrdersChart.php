@@ -10,6 +10,8 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class OrdersChart extends ChartWidget
 {
+    protected static ?string $heading = 'Orders per month';
+
     protected static ?int $sort = 1;
 
     protected function getData(): array
@@ -27,22 +29,30 @@ class OrdersChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('widgets/orders-chart.datasets.label'),
+                    'label' => 'Orders',
                     'data' => $data,
                     'fill' => 'start',
                 ],
             ],
-            'labels' => __('widgets/orders-chart.labels'),
+            'labels' => [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ],
         ];
     }
 
     protected function getType(): string
     {
         return 'line';
-    }
-
-    public function getHeading(): string | Htmlable | null
-    {
-        return __('widgets/orders-chart.heading');
     }
 }

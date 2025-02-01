@@ -19,4 +19,9 @@ class HealthCheckResults extends BaseHealthCheckResults
     {
         return __('filament-spatie-health::health.pages.health_check_results.title');
     }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return null;
+    }
 }
